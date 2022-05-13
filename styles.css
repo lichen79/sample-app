@@ -21,7 +21,7 @@ section.congratulations {
     right: 50%;
     bottom: 0;
     border-right: 6px solid #ace;
-    background-color: rgb(7, 250, 68);
+    background-color: rgb(31, 7, 250);
 }
 section.congratulations h1 {
     margin: 0 0 25px 0;
@@ -119,7 +119,7 @@ section.instructions a:hover {
     }
     section.congratulations, section.instructions {
         position: relative;
-        margin:; 0;
+        margin: 0;
         border: 0;
         padding: 10px;
         width: 100%;
