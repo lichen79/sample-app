@@ -1,0 +1,39 @@
+#!/bin/bash -xe
+sudo amazon-linux-extras install epel
+sudo yum install -y aws-cfn-bootstrap
+sudo mkdir /web
+/opt/aws/bin/cfn-init -v  --stack jenkinsstack1 --resource JenkinsServer  --configsets install_all  --region us-east-1
+# Install Jenkins and Java8
+sudo yum install wget -y
+sudo yum install epel-release -y
+sudo yum install nginx -y
+sudo yum install git -y
+sudo systemctl -l enable nginx -y
+sudo systemctl -l start nginx -y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+sudo yum install java-1.8.0-openjdk -y
+sudo yum update -y
+sudo yum install jenkins -y
+sudo service jenkins start
+sudo chkconfig jenkins on
+# Update the AWS CLI to the latest version
+sudo yum update -y aws-cli
+# Wait 30 seconds to allow Jenkins to startup
+echo "Waiting 30 seconds for Jenkins to start....."
+sleep 30
+## Nginx setup
+sudo service nginx restart
+# Restart Jenkins Service
+/etc/init.d/jenkins restart
+#Restart NGINX service
+sudo service nginx restart
+sleep 90
+cp /var/lib/jenkins/secrets/initialAdminPassword /web/initalpass.html 
+chown nginx:nginx /web/initalpass.html 
+# Configure AWS CLI and GIT for jenkins user
+sudo su - jenkins --shell /bin/bash -c "aws configure set region eu-east-1" 
+sudo su - jenkins --shell /bin/bash -c "aws configure set output json" 
+#until [ -f /var/lib/jenkins/jenkins.install.InstallUtil.lastExecVersion ]; do   sleep 5; service jenkins restart; done
+while [ ! -f /var/lib/jenkins/jenkins.install.InstallUtil.lastExecVersion ]; do echo waiting for jenkins to finish setup; sleep 10; done; service jenkins restart
+
